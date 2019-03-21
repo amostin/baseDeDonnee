@@ -6,37 +6,42 @@ from produit
 select distinct localite
 from client
 where nom is not null
+order by LOCALITE
 
 //1.3
 select ncli, nom, localite
 from client
-where cat = "c1"
-and localite <> "Toulouse"
+where cat = 'c1'
+and localite <> 'Toulouse'
 
-     select distinct LOCALITE 
-     from   CLIENT
-     where  CAT = 'C1'; 
+select ncli, nom, localite
+from client
+where cat = 'c1'
+and localite not in 
+    (select LOCALITE
+    FROM CLIENT
+    WHERE LOCALITE = 'Toulouse') 
 
 
 //1.4
-select npro, libelle, prix
+select *
 from produit
-where libelle like "%acier%"
-or libelle like "%acier"
-or libelle like "acier%"
-or libelle = "acier"
+where libelle like '%acier%'
+or libelle like '%acier'
+or libelle like 'acier%'
+or libelle = 'acier'
 
 //1.5
 select ncli, nom, compte
 from client
-where localite in ("bruxelles, poitiers")
+where localite in ('bruxelles', 'poitiers')
 and compte > 0
 
 //1.7
-select cat
+select distinct cat
 from client
 where cat is not null
-and localite = "toulouse"
+and localite = 'toulouse'
 
 //1.8
 select ncli, nom, localite
@@ -46,17 +51,18 @@ where substring(nom, 1, 1) < substring(localite, 1, 1)
 //1.9
 select 
 sum(compte) as SOMME, 
-avg(compte) as MOYENNE, 
+cast(round(avg(compte), 2) as decimal(6,2)) as MOYENNE, 
 min(compte) as MINIMUM,
 max(compte) as MAXIMUM
 from client
 
 //1.10
-select ncli
+select c.ncli
 from client as c
 join commande as co on c.ncli = co.ncli
 join detail as d on co.ncom = d.ncom
 where d.npro = 'CS464'
+order by c.NCLI
 
 //1.11
 select distinct localite
@@ -68,64 +74,69 @@ where d.npro = 'CS464'
 //1.12
 select distinct ncli, nom
 from client
-where ncli not in 
+where localite = 'namur'
+and ncli not in 
 	(select ncli
 	from commande)
 
 //1.13
 select distinct npro
 from produit
-where libelle like '%sapin%'
-or libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
-and npro not in 
+where npro in 
 	(select npro
 	from detail)
+and 
+(libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin')
+
 
 //1.17
 select ncli, localite
 from client
-where localite = "lille"
-or localite = "namur"
+where localite = 'lille'
+or localite = 'namur'
 
+// le k111 habite juste a lille
 select ncli, localite
 from client
-where localite = "lille"
+where localite = 'lille'
 and localite not in 
 	(select localite
 	from client
-	where localite = "namur")
+	where localite = 'namur')
 
 select ncli, localite
 from client
-where localite = "lille"
+where localite = 'lille'
 or localite not in 
 	(select localite
 	from client
-	where localite = "namur")
+	where localite = 'namur')
 
 select ncli, localite
 from client
 where localite not in 
 	(select localite
 	from client
-	where localite = "lille")
+	where localite = 'lille')
 and localite not in 
 	(select localite
 	from client
-	where localite = "namur")
+	where localite = 'namur')
 
+// ce sont tout le monde car celui qui habite namur nhabite pas a lille et inversement donc ils sont selectionnés
 select ncli, localite
 from client
 where localite not in 
 	(select localite
 	from client
-	where localite = "lille")
+	where localite = 'lille')
 or localite not in 
 	(select localite
 	from client
-	where localite = "namur")
+	where localite = 'namur')
 
 select ncli, localite, cat
 from client
@@ -143,8 +154,8 @@ where cat =  'c1'
 and localite not in 
 	(select localite
 	from client
-	where localite = "namur")
-
+	where localite = 'namur')
+order by ncli
 
 select ncli, localite, cat
 from client
@@ -155,7 +166,7 @@ where ncli not in
 	and localite not in 
 		(select localite
 		from client
-		where localite = "namur"))
+		where localite = 'namur'))
 
 select ncli, localite, cat
 from client
@@ -198,93 +209,117 @@ select sum(prix*qstock) as total
 from produit
 
 //1.20
-select d.qcom*p.prix as montant
+select sum(d.qcom*p.prix) as montant
 from detail as d
 join produit as p on d.npro = p.npro
 where libelle like '%sapin%'
-or libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
 
-//1.21
+//1.21 https://dba-presents.com/index.php/databases/sql-server/36-order-by-and-nulls-last-in-sql-server
 select 
 cat,
 sum(compte) as SUM,
-avg(compte) as AVG,
+cast(avg(compte) as decimal(6,2)) as AVG,
 count(ncli) as COUNT
 from client
 group by cat
+order by 
+CASE WHEN cat IS NULL THEN 1 ELSE 0 END asc, cat asc;
 
 select 
 localite,
 sum(compte) as SUM,
-avg(compte) as AVG,
+cast(avg(compte) as decimal(6,2)) as AVG,
 count(ncli) as COUNT
 from client
 group by localite
+order by localite
 
 select 
 localite, 
 cat,
 sum(compte) as SUM,
-avg(compte) as AVG,
+cast(avg(compte) as decimal(6,2)) as AVG,
 count(ncli) as COUNT
 from client
 group by localite, cat
+order by CASE WHEN cat IS NULL THEN 1 ELSE 0 END asc, cat asc;
+
 
 //1.22
-select npro, libelle
-from produit
-join detail as d on p.npro = d.npro
-where 
-libelle like '%sapin%'
-or libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
-and npro not in (
+select p.npro, libelle
+from produit as p
+left join detail as d on p.npro = d.npro
+where p.npro not in (
 	select npro
 	from detail)
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
 
+select distinct p.npro, libelle
+from produit as p
+join detail as d on p.npro = d.npro
+join commande as co on d.ncom = co.ncom
+join client as c on co.ncli = c.ncli
+where localite = 'Toulouse'
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+order by p.NPRO
+
+// nprod commandé a lille sont les meme que npro de toulouse
 select npro, libelle
 from produit as p
 join detail as d on p.npro = d.npro
 join commande as co on d.ncom = co.ncom
 join client as c on co.ncli = c.ncli
-where libelle like '%sapin%'
-or libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
-and localite = 'Toulouse'
-
-select npro, libelle
-from produit as p
-join detail as d on p.npro = d.npro
-join commande as co on d.ncom = co.ncom
-join client as c on co.ncli = c.ncli
-where libelle like '%sapin%'
-or libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
-and localite not in
+where localite not in
 	(select localite 
 	from client
 	where localite = 'Toulouse')
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+
+?
+?
+?
 
 //1.23
-select count(distinct ncom)
-from detail as d
-join produit as p on d.npro = p.npro
-having p.libelle like "%sapin"
-or libelle like "sapin%"
-or libelle = "sapin"
+select sum(count) as count
+from (
+    select count(distinct ncom)as count
+    from detail as d
+    join produit as p on d.npro = p.npro
+    group by libelle
+    having libelle like '%sapin%'
+    or p.libelle like '%sapin'
+    or libelle like 'sapin%'
+    or libelle = 'sapin'
+)as count
+
 
 //1.24
-select count(distinct localite)
+select count(distinct localite) as count
 from client
+group by cat
 having cat = 'c1'
 
+
 //1.28
-select ncli
+select c.ncli
 from client as c
 join commande as co on c.ncli = co.ncli
 join detail as d on co.ncom = d.ncom
@@ -294,7 +329,7 @@ d.npro = 'pa60'
 and d.npro not in 
 	(select npro
 	from detail
-	where npro 'pa45')
+	where npro= 'pa45')
 )
 or
 (
@@ -302,7 +337,7 @@ d.npro = 'pa45'
 and d.npro not in 
 	(select npro
 	from detail
-	where npro 'pa60')
+	where npro ='pa60')
 )
 
 
