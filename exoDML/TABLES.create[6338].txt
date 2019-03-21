@@ -1,0 +1,30 @@
+﻿create table CLIENT
+(NCLI char(4) not null,
+ NOM  varchar(12) not null,
+ ADRESSE varchar(20) not null,
+ LOCALITE varchar(12) not null,
+ CAT char(2),
+ COMPTE decimal(9,2) not null,
+ primary key (NCLI));
+
+create table PRODUIT
+(NPRO char(5) not null,
+ LIBELLE varchar(20) not null,
+ PRIX decimal(5,0) not null,
+ QSTOCK decimal(6,0) not null,
+ primary key (NPRO));
+
+create table COMMANDE
+(NCOM char(5) not null,
+ NCLI char(4) not null,
+ DATECOM datetime not null,
+ primary key (NCOM),
+ foreign key (NCLI) references CLIENT);
+
+create table DETAIL
+(NCOM char(5) not null,
+ NPRO char(5) not null,
+ QCOM decimal(4,0) not null,
+ primary key (NCOM,NPRO),
+ foreign key (NCOM) references COMMANDE,
+ foreign key (NPRO) references PRODUIT);
