@@ -332,10 +332,7 @@ from produit as p
 left join detail as d on p.npro = d.npro
 left join commande as co on d.ncom = co.ncom
 left join client as c on co.ncli = c.ncli
-where p.npro not in (
-	select npro
-	from detail)
-or p.NPRO not in 
+where p.NPRO not in 
     (select p.NPRO
     from CLIENT as c
     join commande as COMMANDE
@@ -349,8 +346,30 @@ or libelle like 'sapin%'
 or libelle = 'sapin'
 )
 
+//1224
+select p.npro, libelle
+from produit as p
+left join detail as d on p.npro = d.npro
+left join commande as co on d.ncom = co.ncom
+left join client as c on co.ncli = c.ncli
+where p.NPRO not in 
+    (select p.NPRO
+    from CLIENT as c
+    join commande as COMMANDE
+    join detail as d
+    join PRODUIT as p
+    where c.LOCALITE <> 'toulouse')
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+and p.npro in (
+	select npro
+	from detail)
 
-?
+
 ?
 ?
 
