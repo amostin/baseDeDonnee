@@ -323,23 +323,11 @@ select c.ncli
 from client as c
 join commande as co on c.ncli = co.ncli
 join detail as d on co.ncom = d.ncom
-where 
-(
-d.npro = 'pa60'
-and d.npro not in 
-	(select npro
-	from detail
-	where npro= 'pa45')
-)
-or
-(
-d.npro = 'pa45'
-and d.npro not in 
-	(select npro
-	from detail
-	where npro ='pa60')
-)
-
+where d.npro = 'pa60'
+or d.npro= 'pa45'
+group by c.NCLI
+having count(c.NCLI) = 1
+order by c.NCLI desc
 
 //1.30
 
