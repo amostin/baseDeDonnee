@@ -213,9 +213,7 @@ select sum(d.qcom*p.prix) as montant
 from detail as d
 join produit as p on d.npro = p.npro
 where libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
+
 
 //1.21 https://dba-presents.com/index.php/databases/sql-server/36-order-by-and-nulls-last-in-sql-server
 select 
@@ -255,29 +253,20 @@ left join detail as d on p.npro = d.npro
 where p.npro not in (
 	select npro
 	from detail)
-and (
-libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
-)
+and libelle like '%sapin%'
 
-1.222
+
+//1.222
 select distinct p.npro, libelle
 from produit as p
 join detail as d on p.npro = d.npro
 join commande as co on d.ncom = co.ncom
 join client as c on co.ncli = c.ncli
 where localite = 'Toulouse'
-and (
-libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
-)
+and libelle like '%sapin%'
 order by p.NPRO
 
-1.223
+//1223 test
 // nprod commandé a lille sont les meme que npro de toulouse
 select p.npro, libelle
 from produit as p
@@ -295,6 +284,7 @@ or libelle like 'sapin%'
 or libelle = 'sapin'
 )
 
+//1223 test
 //client commande sapin pas toulouse
 select c.ncli
 from CLIENT as c
@@ -304,7 +294,7 @@ join PRODUIT as p
 where p.LIBELLE like '%sapin%'
 and c.LOCALITE <> 'toulouse'
 
-
+//1223 test
 //reste juste enlever cs464 qui est un produit qui a ete commandé a toulouse et lille poitier donc il est pris
 select p.npro, libelle, c.LOCALITE, c.NCLI, co.NCOM
 from produit as p
@@ -328,7 +318,7 @@ or libelle like 'sapin%'
 or libelle = 'sapin'
 )
 
-
+//1223 vrai reponse
 select p.npro, libelle
 from produit as p
 left join detail as d on p.npro = d.npro
@@ -341,19 +331,11 @@ where p.NPRO not in
     join detail as d
     join PRODUIT as p
     where c.LOCALITE = 'toulouse')
-and (
-libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
-)
+and libelle like '%sapin%'
 
 //1224
 select p.npro, libelle
 from produit as p
-left join detail as d on p.npro = d.npro
-left join commande as co on d.ncom = co.ncom
-left join client as c on co.ncli = c.ncli
 where p.NPRO not in 
     (select p.NPRO
     from CLIENT as c
@@ -361,12 +343,7 @@ where p.NPRO not in
     join detail as d
     join PRODUIT as p
     where c.LOCALITE <> 'toulouse')
-and (
-libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
-)
+and libelle like '%sapin%'
 and p.npro in (
 	select npro
 	from detail)
@@ -392,10 +369,10 @@ libelle like '%sapin%'
 //1226
 select distinct p.npro, libelle
 from produit as p
-left join detail as d on p.npro = d.npro
-left join commande as co on d.ncom = co.ncom
-left join client as c on co.ncli = c.ncli
-where (p.NPRO  in 
+ join detail as d on p.npro = d.npro
+ join commande as co on d.ncom = co.ncom
+ join client as c on co.ncli = c.ncli
+where p.NPRO  in 
     (select p.NPRO
     from CLIENT as c
     join commande as COMMANDE
@@ -405,16 +382,9 @@ where (p.NPRO  in
 and localite  in
 	(select localite 
 	from client
-	where localite = 'Toulouse'))
-and (
-libelle like '%sapin%'
-or libelle like '%sapin'
-or libelle like 'sapin%'
-or libelle = 'sapin'
-)
-and p.npro in (
-	select npro
-	from detail)
+	where localite = 'Toulouse')
+and libelle like '%sapin%'
+
 
 //1.23
 select sum(count) as count
@@ -424,9 +394,6 @@ from (
     join produit as p on d.npro = p.npro
     group by libelle
     having libelle like '%sapin%'
-    or p.libelle like '%sapin'
-    or libelle like 'sapin%'
-    or libelle = 'sapin'
 )as count
 
 
