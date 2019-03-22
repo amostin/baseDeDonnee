@@ -248,7 +248,7 @@ group by localite, cat
 order by CASE WHEN cat IS NULL THEN 1 ELSE 0 END asc, cat asc;
 
 
-//1.22
+//1.221
 select p.npro, libelle
 from produit as p
 left join detail as d on p.npro = d.npro
@@ -262,6 +262,7 @@ or libelle like 'sapin%'
 or libelle = 'sapin'
 )
 
+1.222
 select distinct p.npro, libelle
 from produit as p
 join detail as d on p.npro = d.npro
@@ -276,6 +277,7 @@ or libelle = 'sapin'
 )
 order by p.NPRO
 
+1.223
 // nprod commandé a lille sont les meme que npro de toulouse
 select p.npro, libelle
 from produit as p
@@ -369,8 +371,24 @@ and p.npro in (
 	select npro
 	from detail)
 
+//1225
+select p.npro, libelle, c.LOCALITE
+from produit as p
+join detail as d on p.npro = d.npro
+join commande as co on d.ncom = co.ncom
+join client as c on co.ncli = c.ncli
+where localite in
+	(select localite 
+	from client
+	where localite = 'Toulouse')
+or localite not in
+	(select localite 
+	from client
+	where localite = 'Toulouse')
+and 
+libelle like '%sapin%'
 
-?
+
 ?
 
 //1.23
