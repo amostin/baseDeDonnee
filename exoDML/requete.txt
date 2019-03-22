@@ -389,7 +389,32 @@ and
 libelle like '%sapin%'
 
 
-?
+//1226
+select distinct p.npro, libelle
+from produit as p
+left join detail as d on p.npro = d.npro
+left join commande as co on d.ncom = co.ncom
+left join client as c on co.ncli = c.ncli
+where (p.NPRO  in 
+    (select p.NPRO
+    from CLIENT as c
+    join commande as COMMANDE
+    join detail as d
+    join PRODUIT as p
+    where c.LOCALITE <> 'toulouse')
+and localite  in
+	(select localite 
+	from client
+	where localite = 'Toulouse'))
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+and p.npro in (
+	select npro
+	from detail)
 
 //1.23
 select sum(count) as count
