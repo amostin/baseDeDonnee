@@ -277,7 +277,7 @@ or libelle = 'sapin'
 order by p.NPRO
 
 // nprod commandé a lille sont les meme que npro de toulouse
-select npro, libelle
+select p.npro, libelle
 from produit as p
 join detail as d on p.npro = d.npro
 join commande as co on d.ncom = co.ncom
@@ -292,6 +292,63 @@ or libelle like '%sapin'
 or libelle like 'sapin%'
 or libelle = 'sapin'
 )
+
+//client commande sapin pas toulouse
+select c.ncli
+from CLIENT as c
+join commande as COMMANDE
+join detail as d
+join PRODUIT as p
+where p.LIBELLE like '%sapin%'
+and c.LOCALITE <> 'toulouse'
+
+
+//reste juste enlever cs464 qui est un produit qui a ete commandé a toulouse et lille poitier donc il est pris
+select p.npro, libelle, c.LOCALITE, c.NCLI, co.NCOM
+from produit as p
+left join detail as d on p.npro = d.npro
+left join commande as co on d.ncom = co.ncom
+left join client as c on co.ncli = c.ncli
+where p.npro not in (
+	select npro
+	from detail)
+or c.NCLI in 
+    (select c.ncli
+    from CLIENT as c
+    join commande as COMMANDE
+    join detail as d
+    join PRODUIT as p
+    where c.LOCALITE <> 'toulouse')
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+
+
+select p.npro, libelle
+from produit as p
+left join detail as d on p.npro = d.npro
+left join commande as co on d.ncom = co.ncom
+left join client as c on co.ncli = c.ncli
+where p.npro not in (
+	select npro
+	from detail)
+or p.NPRO not in 
+    (select p.NPRO
+    from CLIENT as c
+    join commande as COMMANDE
+    join detail as d
+    join PRODUIT as p
+    where c.LOCALITE = 'toulouse')
+and (
+libelle like '%sapin%'
+or libelle like '%sapin'
+or libelle like 'sapin%'
+or libelle = 'sapin'
+)
+
 
 ?
 ?
